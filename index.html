@@ -1,0 +1,336 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{padding:0 0 3rem;max-width:700px;margin:0 auto}
+.top-header{background:linear-gradient(135deg,#0F6E56,#1D9E75);border-radius:var(--border-radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;color:white}
+.top-header h1{font-size:16px;font-weight:600;margin-bottom:.25rem}
+.top-header p{font-size:12px;opacity:.8}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.meta-field label{font-size:11px;font-weight:500;color:var(--color-text-secondary);display:block;margin-bottom:4px}
+.meta-field input,.meta-field select{width:100%;font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary)}
+.meta-field input:focus,.meta-field select:focus{outline:none;border-color:#1D9E75}
+
+/* Profile tabs */
+.profile-tabs{display:flex;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap}
+.ptab{font-size:11px;padding:6px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;transition:all .15s;white-space:nowrap}
+.ptab.active{color:white;border-color:transparent}
+.ptab[data-p="monitor"].active{background:#22C55E}
+.ptab[data-p="crm"].active{background:#3B82F6}
+.ptab[data-p="formation"].active{background:#F97316}
+.ptab[data-p="trafic"].active{background:#A855F7}
+.ptab[data-p="benchmark"].active{background:#F59E0B}
+
+/* Profile block */
+.profile-block{display:none}
+.profile-block.visible{display:block}
+
+.hyp-band{border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:1.2rem;font-size:12px;line-height:1.6}
+.hyp-band strong{font-size:11px;font-weight:600;display:block;margin-bottom:3px;opacity:.8}
+
+.section-hdr{font-size:12px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin:1.2rem 0 .6rem;display:flex;align-items:center;gap:6px}
+.section-hdr .ico{font-size:14px}
+
+/* Item row */
+.item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.item:last-child{border-bottom:none}
+.item-label{font-size:13px;color:var(--color-text-primary);flex:1;line-height:1.4}
+
+/* Rating stars */
+.stars{display:flex;gap:3px;flex-shrink:0}
+.star{font-size:16px;cursor:pointer;color:var(--color-border-secondary);transition:color .1s;line-height:1;user-select:none}
+.star.lit{color:#F59E0B}
+
+/* Notes area */
+.notes-section{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;margin-top:1.5rem}
+.notes-section h3{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+.note-block{margin-bottom:.75rem}
+.note-block label{font-size:11px;font-weight:500;color:var(--color-text-secondary);display:block;margin-bottom:4px}
+.note-ta{width:100%;font-size:13px;padding:8px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);resize:none;font-family:var(--font-sans);min-height:52px}
+.note-ta:focus{outline:none;border-color:#1D9E75}
+
+/* Score summary */
+.score-summary{display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem}
+.score-val{font-size:28px;font-weight:700;color:#1D9E75}
+.score-lbl{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.score-bar-wrap{flex:1;margin:0 1.5rem}
+.score-bar-bg{height:8px;background:var(--color-border-tertiary);border-radius:4px;overflow:hidden}
+.score-bar-fill{height:100%;background:linear-gradient(90deg,#1D9E75,#A7F0D4);border-radius:4px;transition:width .4s}
+
+/* Export */
+.export-btn{margin-top:1.5rem;width:100%;font-size:13px;padding:11px;border:0.5px solid #1D9E75;border-radius:var(--border-radius-md);background:transparent;color:#085041;cursor:pointer;transition:background .15s;font-family:var(--font-sans)}
+.export-btn:hover{background:#E1F5EE}
+
+/* Progress bar at top */
+.progress-row{display:flex;gap:4px;margin-bottom:1.5rem}
+.prog-seg{flex:1;height:4px;border-radius:2px;background:var(--color-border-tertiary);transition:background .3s}
+</style>
+
+<div class="app">
+  <div class="top-header">
+    <h1>✅ Checklist Visite Magasin</h1>
+    <p>Évaluez chaque critère de 1 à 5 étoiles · Ajoutez vos notes par section</p>
+  </div>
+
+  <div class="meta-grid">
+    <div class="meta-field"><label>Magasin</label><input id="m-mag" type="text" placeholder="Nom / code"/></div>
+    <div class="meta-field"><label>Date</label><input id="m-date" type="date"/></div>
+    <div class="meta-field"><label>Responsable secteur</label><input id="m-resp" type="text" placeholder="Nom"/></div>
+    <div class="meta-field"><label>Profil data du magasin</label>
+      <select id="m-profil" onchange="switchProfile(this.value)">
+        <option value="monitor">🟢 Monitor — Performance Stable</option>
+        <option value="crm">🔵 Activer CRM — Fidélisation</option>
+        <option value="formation">🟠 Formation Vente — Perf. Commerciale</option>
+        <option value="trafic">🟣 Trafic & Attractivité</option>
+        <option value="benchmark">🏆 Benchmark — Best Practices</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="profile-tabs">
+    <div class="ptab active" data-p="monitor" onclick="switchProfile('monitor')">🟢 Monitor</div>
+    <div class="ptab" data-p="crm" onclick="switchProfile('crm')">🔵 CRM</div>
+    <div class="ptab" data-p="formation" onclick="switchProfile('formation')">🟠 Formation</div>
+    <div class="ptab" data-p="trafic" onclick="switchProfile('trafic')">🟣 Trafic</div>
+    <div class="ptab" data-p="benchmark" onclick="switchProfile('benchmark')">🏆 Benchmark</div>
+  </div>
+
+  <!-- ══ MONITOR ══ -->
+  <div class="profile-block visible" id="p-monitor">
+    <div class="hyp-band" style="background:#DCFCE7;color:#14532D"><strong>🎯 Hypothèse Data</strong>Le magasin présente des indicateurs globalement stables sans signal critique majeur identifié.</div>
+    <div class="section-hdr"><span class="ico">🏬</span>Activité & dynamique magasin</div>
+    <div id="s-monitor-1"></div>
+    <div class="section-hdr"><span class="ico">👥</span>Expérience client</div>
+    <div id="s-monitor-2"></div>
+    <div class="section-hdr"><span class="ico">🛍️</span>Exécution magasin</div>
+    <div id="s-monitor-3"></div>
+    <div class="notes-section">
+      <h3>📝 Notes & observations</h3>
+      <div class="note-block"><label>Points forts observés</label><textarea class="note-ta" rows="2" placeholder="Ce qui fonctionne bien dans ce magasin…"></textarea></div>
+      <div class="note-block"><label>Points d'amélioration</label><textarea class="note-ta" rows="2" placeholder="Ce qui pourrait être amélioré…"></textarea></div>
+      <div class="note-block"><label>Ce que l'analyse data doit confirmer</label><textarea class="note-ta" rows="2" placeholder="Quels éléments semblent contribuer à la stabilité et à la régularité des performances ?"></textarea></div>
+    </div>
+  </div>
+
+  <!-- ══ CRM ══ -->
+  <div class="profile-block" id="p-crm">
+    <div class="hyp-band" style="background:#DBEAFE;color:#1E3A5F"><strong>🎯 Hypothèse Data</strong>Le magasin présente une fréquence d'achat faible malgré un niveau d'activité satisfaisant.</div>
+    <div class="section-hdr"><span class="ico">💳</span>Activation CRM & fidélisation</div>
+    <div id="s-crm-1"></div>
+    <div class="section-hdr"><span class="ico">👩‍💼</span>Relation cliente</div>
+    <div id="s-crm-2"></div>
+    <div class="section-hdr"><span class="ico">📣</span>Animation fidélisation</div>
+    <div id="s-crm-3"></div>
+    <div class="notes-section">
+      <h3>📝 Notes & observations</h3>
+      <div class="note-block"><label>Pratiques CRM observées</label><textarea class="note-ta" rows="2" placeholder="Comment la carte fidélité est-elle proposée ? Quel discours ?…"></textarea></div>
+      <div class="note-block"><label>Freins à la récurrence identifiés</label><textarea class="note-ta" rows="2" placeholder="Pourquoi les clientes ne reviennent pas assez ?…"></textarea></div>
+      <div class="note-block"><label>Ce que l'analyse data doit confirmer</label><textarea class="note-ta" rows="2" placeholder="Quels éléments peuvent expliquer une faible récurrence malgré une activité correcte ?"></textarea></div>
+    </div>
+  </div>
+
+  <!-- ══ FORMATION ══ -->
+  <div class="profile-block" id="p-formation">
+    <div class="hyp-band" style="background:#FFEDD5;color:#431407"><strong>🎯 Hypothèse Data</strong>Le magasin bénéficie d'un trafic satisfaisant mais génère une valeur par ticket limitée.</div>
+    <div class="section-hdr"><span class="ico">🛒</span>Qualité de vente</div>
+    <div id="s-formation-1"></div>
+    <div class="section-hdr"><span class="ico">💬</span>Discours commercial</div>
+    <div id="s-formation-2"></div>
+    <div class="section-hdr"><span class="ico">🏷️</span>Valorisation commerciale</div>
+    <div id="s-formation-3"></div>
+    <div class="notes-section">
+      <h3>📝 Notes & observations</h3>
+      <div class="note-block"><label>Comportements commerciaux observés</label><textarea class="note-ta" rows="2" placeholder="Upsell, cross-sell, routine complète… ce qui est fait ou pas fait…"></textarea></div>
+      <div class="note-block"><label>Besoins de formation identifiés</label><textarea class="note-ta" rows="2" placeholder="Sur quels aspects l'équipe doit-elle progresser ?…"></textarea></div>
+      <div class="note-block"><label>Ce que l'analyse data doit confirmer</label><textarea class="note-ta" rows="2" placeholder="Quels comportements commerciaux limitent le panier moyen ?"></textarea></div>
+    </div>
+  </div>
+
+  <!-- ══ TRAFIC ══ -->
+  <div class="profile-block" id="p-trafic">
+    <div class="hyp-band" style="background:#F3E8FF;color:#2E1065"><strong>🎯 Hypothèse Data</strong>Le magasin présente un bon niveau de vente par cliente mais un volume de trafic limité.</div>
+    <div class="section-hdr"><span class="ico">👀</span>Visibilité & attractivité</div>
+    <div id="s-trafic-1"></div>
+    <div class="section-hdr"><span class="ico">🌍</span>Environnement local</div>
+    <div id="s-trafic-2"></div>
+    <div class="section-hdr"><span class="ico">📢</span>Activation locale</div>
+    <div id="s-trafic-3"></div>
+    <div class="notes-section">
+      <h3>📝 Notes & observations</h3>
+      <div class="note-block"><label>Contexte de l'emplacement</label><textarea class="note-ta" rows="2" placeholder="Zone, flux piéton, concurrence, accessibilité…"></textarea></div>
+      <div class="note-block"><label>Leviers d'attractivité à activer</label><textarea class="note-ta" rows="2" placeholder="Vitrine, signalétique, animation locale…"></textarea></div>
+      <div class="note-block"><label>Ce que l'analyse data doit confirmer</label><textarea class="note-ta" rows="2" placeholder="Quels éléments peuvent limiter l'attractivité et le trafic ?"></textarea></div>
+    </div>
+  </div>
+
+  <!-- ══ BENCHMARK ══ -->
+  <div class="profile-block" id="p-benchmark">
+    <div class="hyp-band" style="background:#FEF9C3;color:#422006"><strong>🎯 Hypothèse Data</strong>Le magasin présente une performance élevée sur plusieurs dimensions clés.</div>
+    <div class="section-hdr"><span class="ico">⭐</span>Dynamique opérationnelle</div>
+    <div id="s-benchmark-1"></div>
+    <div class="section-hdr"><span class="ico">💎</span>Expérience client</div>
+    <div id="s-benchmark-2"></div>
+    <div class="section-hdr"><span class="ico">📈</span>Performance commerciale</div>
+    <div id="s-benchmark-3"></div>
+    <div class="notes-section">
+      <h3>📝 Notes & observations</h3>
+      <div class="note-block"><label>Best practices observées</label><textarea class="note-ta" rows="2" placeholder="Pratiques remarquables à documenter et partager…"></textarea></div>
+      <div class="note-block"><label>Ce qui pourrait être répliqué</label><textarea class="note-ta" rows="2" placeholder="Quels comportements ou processus sont reproductibles sur le réseau ?…"></textarea></div>
+      <div class="note-block"><label>Ce que l'analyse data doit confirmer</label><textarea class="note-ta" rows="2" placeholder="Quelles pratiques expliquent la surperformance de ce magasin ?"></textarea></div>
+    </div>
+  </div>
+
+  <!-- Score global -->
+  <div class="score-summary" id="score-summary">
+    <div>
+      <div class="score-val" id="score-val">—</div>
+      <div class="score-lbl">Score global</div>
+    </div>
+    <div class="score-bar-wrap">
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:6px">Niveau d'évaluation complété</div>
+      <div class="score-bar-bg"><div class="score-bar-fill" id="score-bar" style="width:0%"></div></div>
+    </div>
+    <div style="font-size:11px;color:var(--color-text-secondary);text-align:right" id="score-detail">0/0<br>critères notés</div>
+  </div>
+
+  <button class="export-btn" onclick="saveVisite()">
+💾 Enregistrer la visite
+</button>
+</div>
+
+<script>
+const DATA = {
+  monitor: [
+    ["s-monitor-1", ["Activité régulière tout au long de la visite","Flux clients cohérent avec l'environnement","Équipe active et organisée","Aucun temps mort ou désorganisation visible"]],
+    ["s-monitor-2", ["Accueil client naturel et fluide","Clientes accompagnées sans attente excessive","Parcours client clair et agréable","Ambiance magasin positive et stable"]],
+    ["s-monitor-3", ["Produits et offres bien visibles","Merchandising cohérent et entretenu","Standards réseau globalement respectés","Magasin propre et bien tenu"]]
+  ],
+  crm: [
+    ["s-crm-1", ["Carte fidélité proposée naturellement","Collecte données clientes visible en caisse","CRM intégré dans le discours vendeuse","Mise en avant avantages fidélité"]],
+    ["s-crm-2", ["Relation vendeuse / cliente personnalisée","Clientes régulières reconnues par l'équipe","Conseils adaptés au profil cliente","Suivi ou relance évoqué pendant l'échange"]],
+    ["s-crm-3", ["Campagnes ou activations CRM visibles","Communication fidélité présente en magasin","Clientes engagées avec les offres fidélité"]]
+  ],
+  formation: [
+    ["s-formation-1", ["Produits complémentaires proposés","Routine complète suggérée","Cross-sell / upsell visible","Mise en avant des nouveautés ou promotions"]],
+    ["s-formation-2", ["Discours structuré et fluide","Capacité à créer du besoin","Conseils adaptés à la cliente","Interaction vendeuse / cliente dynamique"]],
+    ["s-formation-3", ["Produits stratégiques bien mis en avant","Zones promotionnelles visibles","Produits complémentaires proches les uns des autres"]]
+  ],
+  trafic: [
+    ["s-trafic-1", ["Vitrine attractive et visible","Magasin identifiable facilement","Signalétique claire","Entrée magasin engageante"]],
+    ["s-trafic-2", ["Zone commerciale dynamique","Flux piéton suffisant autour du magasin","Concurrence proche visible","Accessibilité magasin correcte"]],
+    ["s-trafic-3", ["Animations ou activations visibles","Communication locale présente","Mise en avant des offres depuis l'extérieur"]]
+  ],
+  benchmark: [
+    ["s-benchmark-1", ["Équipe proactive et dynamique","Gestion fluide des clientes","Bonne coordination équipe","Niveau d'énergie élevé en magasin"]],
+    ["s-benchmark-2", ["Qualité de conseil élevée","Parcours client fluide","Expérience différenciante visible","Clientes engagées et réceptives"]],
+    ["s-benchmark-3", ["Vente additionnelle naturelle","Forte mise en avant des produits","Cross-sell intégré naturellement","Forte valorisation des offres"]]
+  ]
+};
+
+let ratings = {};
+
+function buildItems(pid) {
+  (DATA[pid] || []).forEach(([sid, items]) => {
+    const el = document.getElementById(sid);
+    if (!el) return;
+    el.innerHTML = items.map((label, i) => {
+      const key = sid + '_' + i;
+      return `<div class="item">
+        <div class="item-label">${label}</div>
+        <div class="stars" data-key="${key}">
+          ${[1,2,3,4,5].map(n=>`<span class="star" data-v="${n}" onclick="rate('${key}',${n},this.parentNode)">★</span>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  });
+}
+
+function rate(key, val, container) {
+  ratings[key] = val;
+  container.querySelectorAll('.star').forEach((s,i) => s.classList.toggle('lit', i < val));
+  updateScore();
+}
+
+function updateScore() {
+  const vals = Object.values(ratings).filter(v => v > 0);
+  const total = vals.length;
+  const sum = vals.reduce((a,b)=>a+b,0);
+  const avg = total ? (sum/total).toFixed(1) : '—';
+  document.getElementById('score-val').textContent = avg !== '—' ? avg + '/5' : '—';
+  document.getElementById('score-detail').innerHTML = total + '/<span id="tot"></span><br>critères notés';
+  const pct = total ? Math.round((sum / (total * 5)) * 100) : 0;
+  document.getElementById('score-bar').style.width = pct + '%';
+}
+
+function switchProfile(pid) {
+  document.querySelectorAll('.profile-block').forEach(b => b.classList.remove('visible'));
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+  const block = document.getElementById('p-' + pid);
+  if (block) block.classList.add('visible');
+  document.querySelector('.ptab[data-p="'+pid+'"]')?.classList.add('active');
+  document.getElementById('m-profil').value = pid;
+  buildItems(pid);
+}
+
+function exportVisite() {
+  const mag = document.getElementById('m-mag').value || '(non renseigné)';
+  const date = document.getElementById('m-date').value || '(non renseignée)';
+  const resp = document.getElementById('m-resp').value || '(non renseigné)';
+  const profil = document.getElementById('m-profil').value;
+  const vals = Object.values(ratings).filter(v=>v>0);
+  const avg = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : 'non évalué';
+  const ratingLines = Object.entries(ratings).filter(([,v])=>v>0)
+    .map(([k,v])=>`  ${k.replace(/_\d+$/,'').replace('s-','').replace(/-/g,' ')} (critère ${k.split('_').pop()}) : ${v}/5`).join('\n');
+  const notes = [...document.querySelectorAll('.note-ta')].map(t=>t.value).filter(Boolean).join(' | ');
+  sendPrompt(`Visite magasin — Réseau cosmétique\n\nMagasin : ${mag}\nDate : ${date}\nResponsable secteur : ${resp}\nProfil data : ${profil}\nScore moyen : ${avg}/5\n\nNotations :\n${ratingLines}\n\nNotes terrain : ${notes}\n\nPeux-tu analyser cette visite, identifier les points critiques et me suggérer les actions prioritaires à mener ?`);
+}
+
+// Init
+buildItems('monitor');
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwryq3w9VYc2CrbhOAt6yG5ikjsh-czMRXVSDoCsfqbBZodNdh6Jk2Kil41-vPMRRXXYA/exec";
+
+async function saveVisite() {
+
+    const vals = Object.values(ratings).filter(v => v > 0);
+
+    const avg = vals.length
+      ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)
+      : 0;
+
+    const notes = [...document.querySelectorAll('.note-ta')]
+      .map(x => x.value);
+
+    const data = {
+      magasin: document.getElementById('m-mag').value,
+      dateVisite: document.getElementById('m-date').value,
+      responsable: document.getElementById('m-resp').value,
+      profil: document.getElementById('m-profil').value,
+      score: avg,
+      ratings: ratings,
+      notes: notes
+    };
+
+    try {
+
+      const response = await fetch(WEBAPP_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        alert("✅ Visite enregistrée");
+      } else {
+        alert("❌ Erreur");
+      }
+
+    } catch(error) {
+
+      console.error(error);
+      alert("❌ Impossible d'enregistrer");
+
+    }
+}
+</script>
